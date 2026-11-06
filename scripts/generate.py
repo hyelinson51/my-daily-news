@@ -77,8 +77,16 @@ def select(category,candidates,old_titles):
 응답은 JSON 객체 {"indices":[정수,...]} 하나만, 후보의 0부터 시작하는 인덱스를 최대 10개 순서대로 반환하세요.'''
  prompt=json.dumps({'category':category,'previous_titles':old_titles[:70], 'candidates':[
   {'i':i,'title':c['title'],'snippet':c['snippet'][:170],'date':c['published']} for i,c in enumerate(candidates)]},ensure_ascii=False)
- res=client.responses.create(model=MODEL,instructions=instructions,input=prompt,text={'format':{'type':'json_object'}},max_output_tokens=350)
- indices=json.loads(res.output_text).get('indices',[])
+ res=client.models.generate_content(
+ model=MODEL,
+ contents=prompt,
+ config=types.GenerateContentConfig(
+  system_instruction=instructions,
+  response_mime_type="application/json",
+  max_output_tokens=1000
+ )
+)
+indices=json.loads(res.text).get('indices',[])indices=json.loads(res.output_text).get('indices',[])
  return [candidates[i] for i in indices if isinstance(i,int) and 0<=i<len(candidates)][:10]
 
 def fetch_article(url):
