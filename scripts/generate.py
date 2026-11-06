@@ -12,7 +12,7 @@ from google.genai import types
 
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/'data'
 TODAY=dt.datetime.now(ZoneInfo('Asia/Seoul')).date()
-MODEL=os.getenv('OPENAI_MODEL','gpt-4.1-mini')
+MODEL=os.getenv('GEMINI_MODEL','gemini-2.5-flash')
 MAX_PER_CATEGORY=int(os.getenv('MAX_PER_CATEGORY','5'))
 # Direct publisher RSS feeds. Update feeds when providers change their URLs.
 FEEDS={
@@ -33,7 +33,7 @@ FEEDS={
   'https://www.theguardian.com/environment/rss',
   'https://feeds.bbci.co.uk/news/science_and_environment/rss.xml']}
 UA={'User-Agent':'PersonalNewsReader/1.0 (+RSS aggregation; contact repository owner)'}
-client=OpenAI()
+client=genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 logging.basicConfig(level=logging.INFO,format='%(levelname)s %(message)s')
 
 def read_index():
@@ -105,7 +105,7 @@ terms: 전문용어 1~3개를 쉽고 정확하게 풀이하세요.
  return json.loads(response.output_text)
 
 def main():
- if not os.getenv('OPENAI_API_KEY'):raise RuntimeError('Set OPENAI_API_KEY as a GitHub Actions secret. No placeholder content will be published.')
+ if not os.getenv('GEMINI_API_KEY'):raise RuntimeError('GEMINI_API_KEY is required.')
  DATA.mkdir(exist_ok=True); index=read_index(); results=[]; prior=previous_titles(); urls=set()
  for category in FEEDS:
   logging.info('Collecting %s',category)
