@@ -33,7 +33,7 @@ jobs:
       - name: Generate news
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_MODEL: gemini-2.5-flash
+          GEMINI_MODEL: gemini-3.1-flash
           MAX_PER_CATEGORY: '5'
         run: python scripts/generate.py
 
