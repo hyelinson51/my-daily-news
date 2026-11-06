@@ -7,7 +7,8 @@ from zoneinfo import ZoneInfo
 from urllib.parse import urlparse
 import requests, feedparser, trafilatura
 from bs4 import BeautifulSoup
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 ROOT=Path(__file__).resolve().parents[1]; DATA=ROOT/'data'
 TODAY=dt.datetime.now(ZoneInfo('Asia/Seoul')).date()
