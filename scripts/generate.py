@@ -1,6 +1,5 @@
 """Daily RSS -> original article text -> grounded Korean briefing -> GitHub Pages JSON.
-Run with OPENAI_API_KEY; no model-generated content is published without a source URL.
-"""
+Run with GEMINI_API_KEY; no model-generated content is published without a source URL."""
 import os, json, re, hashlib, datetime as dt, time, logging
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -109,8 +108,17 @@ terms: 전문용어 1~3개를 쉽고 정확하게 풀이하세요.
 반드시 JSON 객체 {"title":"...","summary":"...","background":"...","impact":"...","terms":"..."}만 반환하세요.'''
  payload=json.dumps({'category':category,'article_title':article['title'],'date':article['published'],
  'source':article['source'],'original_text':body},ensure_ascii=False)
- response=client.responses.create(model=MODEL,instructions=instructions,input=payload,text={'format':{'type':'json_object'}},max_output_tokens=1500)
- return json.loads(response.output_text)
+ response=client.models.generate_content(
+ model=MODEL,
+ contents=payload,
+ config=types.GenerateContentConfig(
+  system_instruction=instructions,
+  response_mime_type="application/json",
+  max_output_tokens=4096
+ )
+)
+return json.loads(response.text) 
+return json.loads(response.output_text)
 
 def main():
  if not os.getenv('GEMINI_API_KEY'):raise RuntimeError('GEMINI_API_KEY is required.')
